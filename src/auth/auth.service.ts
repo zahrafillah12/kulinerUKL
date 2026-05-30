@@ -1,6 +1,7 @@
 import {
   Injectable,
-  UnauthorizedException,} from '@nestjs/common';
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -23,26 +24,33 @@ export class AuthService {
       );
     }
 
-    const validPassword = await bcrypt.compare(
+    const isMatch = await bcrypt.compare(
       password,
       user.password,
     );
 
-    if (!validPassword) {
+    if (!isMatch) {
       throw new UnauthorizedException(
         'Password salah',
       );
     }
 
     const payload = {
-      sub: user.id,
+      id: user.id,
       email: user.email,
       role: user.role,
     };
 
     return {
-      message: "Login berhasil",
-      user: user
+      access_token: this.jwtService.sign(
+        payload,
+      ),
+      user: {
+        id: user.id,
+        nama: user.nama,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 }
