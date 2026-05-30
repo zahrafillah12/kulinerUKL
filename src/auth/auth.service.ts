@@ -1,4 +1,6 @@
-import { Injectable,UnauthorizedException,} from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -31,7 +33,6 @@ export class AuthService {
         'Password salah',
       );
     }
-    const { password: _, ...userWithoutPassword } = user;
 
     const payload = {
       sub: user.id,
@@ -40,9 +41,8 @@ export class AuthService {
     };
 
     return {
-    message: 'Login berhasil',
-    access_token: this.jwtService.sign(payload),
-    user: userWithoutPassword, // Sekarang password tidak akan ikut terkirim ke Postman
+      message: "Login berhasil",
+      user: user
     };
-    }
   }
+}
