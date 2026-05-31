@@ -2,8 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import { NestExpressApplication } from '@nestjs/platform-express';
-
 import { join } from 'path';
+
+import {
+  SwaggerModule,
+  DocumentBuilder,
+} from '@nestjs/swagger';
 
 async function bootstrap() {
   const app =
@@ -11,7 +15,7 @@ async function bootstrap() {
       AppModule,
     );
 
-  // akses folder uploads
+  // Folder uploads
   app.useStaticAssets(
     join(__dirname, '..', 'uploads'),
     {
@@ -19,7 +23,26 @@ async function bootstrap() {
     },
   );
 
-  await app.listen(3000);
+  // Swagger
+  const config = new DocumentBuilder()
+    .setTitle('Resep Kuliner API')
+    .setDescription('Dokumentasi API UKL')
+    .setVersion('1.0')
+    .build();
+
+  const document =
+    SwaggerModule.createDocument(
+      app,
+      config,
+    );
+
+  SwaggerModule.setup(
+    'api',
+    app,
+    document,
+  );
+
+  await app.listen(process.env.PORT || 3000);
 }
 
 bootstrap();

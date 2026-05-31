@@ -42,7 +42,6 @@ export class AuthService {
     };
 
     return {
-      TEST: 'ZAHRA',
       access_token: this.jwtService.sign(
         payload,
       ),

@@ -20,17 +20,7 @@ export class RecipesController {
 @Post('upload')
 @UseInterceptors(
   FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploads',
-
-      filename: (req, file, callback) => {
-        const uniqueName =
-          Date.now() + extname(file.originalname);
-
-        callback(null, uniqueName);
-      },
-    }),
-  }),
+ })
 )
 uploadFile(
   @UploadedFile() file: Express.Multer.File,
