@@ -31,7 +31,7 @@ async function bootstrap() {
     app,
     config,
   );
-
+console.log('SWAGGER BERJALAN');
   SwaggerModule.setup(
     'api',
     app,
