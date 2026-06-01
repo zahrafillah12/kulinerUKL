@@ -11,4 +11,11 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('versi')
+  getVersi() {
+    return {
+      versi: 'swagger-2026',
+    };
+  }
 }
