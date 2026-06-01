@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
-
 import {
   SwaggerModule,
   DocumentBuilder,
@@ -40,7 +39,7 @@ async function bootstrap() {
   );
 
   const port =
-    process.env.PORT || 3000;
+    parseInt(process.env.PORT || '3000');
 
   await app.listen(
     port,
@@ -49,6 +48,10 @@ async function bootstrap() {
 
   console.log(
     `Server running on port ${port}`,
+  );
+
+  console.log(
+    `Swagger running at /api`,
   );
 }
 
