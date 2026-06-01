@@ -14,12 +14,10 @@ async function bootstrap() {
       AppModule,
     );
 
-  // Auto buat folder uploads kalau belum ada
-  if (!existsSync('./uploads')) {
-    mkdirSync('./uploads');
-  }
-  if (!existsSync('./uploads/recipes')) {
-    mkdirSync('./uploads/recipes');
+  // Auto buat folder uploads
+  const uploadPath = join(process.cwd(), 'uploads', 'recipes');
+  if (!existsSync(uploadPath)) {
+    mkdirSync(uploadPath, { recursive: true });
   }
 
   app.useStaticAssets(
