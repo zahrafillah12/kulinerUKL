@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import {
   SwaggerModule,
   DocumentBuilder,
@@ -12,6 +13,14 @@ async function bootstrap() {
     await NestFactory.create<NestExpressApplication>(
       AppModule,
     );
+
+  // Auto buat folder uploads kalau belum ada
+  if (!existsSync('./uploads')) {
+    mkdirSync('./uploads');
+  }
+  if (!existsSync('./uploads/recipes')) {
+    mkdirSync('./uploads/recipes');
+  }
 
   app.useStaticAssets(
     join(__dirname, '..', 'uploads'),
