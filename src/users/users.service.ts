@@ -10,20 +10,21 @@ export class UsersService {
   ) {}
 
   // CREATE
-  async create(createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      10,
-    );
+ async create(createUserDto: CreateUserDto) {
+  const hashedPassword = await bcrypt.hash(
+    createUserDto.password,
+    10,
+  );
 
-    return this.prisma.user.create({
-      data: {
-        nama: createUserDto.nama,
-        email: createUserDto.email,
-        password: hashedPassword,
-      },
-    });
-  }
+  return this.prisma.user.create({
+    data: {
+      nama: createUserDto.nama,
+      email: createUserDto.email,
+      password: hashedPassword,
+      role: createUserDto.role || 'USER',
+    },
+  });
+}
 
   // GET ALL
   findAll() {
