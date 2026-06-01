@@ -24,6 +24,7 @@ async function bootstrap() {
     .setTitle('Resep Kuliner API')
     .setDescription('Dokumentasi API UKL')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document =
