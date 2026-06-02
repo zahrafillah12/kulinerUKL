@@ -38,13 +38,15 @@ model Category {
 }
 
 model Recipe {
-  id               Int    @id @default(autoincrement())
+ id               Int    @id @default(autoincrement())
+
   namaMakanan      String
   daerahAsal       String
   gambar           String
-  deskripsi        String
-  bahan            String
-  langkahPembuatan String
+
+  deskripsi        String @db.Text
+  bahan            String @db.Text
+  langkahPembuatan String @db.Text
   durasi           String
   porsi            String
 
