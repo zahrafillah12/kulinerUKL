@@ -7,15 +7,19 @@ import {
   Post,
   Put,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { existsSync, mkdirSync } from 'fs';
-import { ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('recipes')
 export class RecipesController {
@@ -23,14 +27,20 @@ export class RecipesController {
     private readonly recipesService: RecipesService,
   ) {}
 
-  // CREATE
+  // CREATE - hanya ADMIN
   @Post()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   create(@Body() createRecipeDto: CreateRecipeDto) {
     return this.recipesService.create(createRecipeDto);
   }
 
-  // UPLOAD FILE
+  // UPLOAD FILE - hanya ADMIN
   @Post('upload')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -87,20 +97,23 @@ export class RecipesController {
     };
   }
 
-  // GET ALL
+  // GET ALL - semua bisa akses
   @Get()
   findAll() {
     return this.recipesService.findAll();
   }
 
-  // GET BY ID
+  // GET BY ID - semua bisa akses
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.recipesService.findOne(Number(id));
   }
 
-  // UPDATE
+  // UPDATE - hanya ADMIN
   @Put(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   update(
     @Param('id') id: string,
     @Body() updateRecipeDto: CreateRecipeDto,
@@ -111,8 +124,11 @@ export class RecipesController {
     );
   }
 
-  // DELETE
+  // DELETE - hanya ADMIN
   @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   remove(@Param('id') id: string) {
     return this.recipesService.remove(Number(id));
   }
