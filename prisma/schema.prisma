@@ -13,57 +13,102 @@ enum Role {
 }
 
 model User {
-  id         Int        @id @default(autoincrement())
-  nama       String
-  email      String     @unique
-  password   String
-  role       Role       @default(USER)
+  id Int @id @default(autoincrement())
 
-  recipes    Recipe[]
-  favorites  Favorite[]
+  nama     String
+  email    String @unique
+  password String
+  role     Role   @default(USER)
 
-  createdAt  DateTime   @default(now())
+  recipes   Recipe[]
+  favorites Favorite[]
+
+  payments Payment[]
+
+  purchases Purchase[] // <- HARUS ADA
+
+  createdAt DateTime @default(now())
 }
 
 model Category {
-  id         Int        @id @default(autoincrement())
-  nama       String
+  id   Int    @id @default(autoincrement())
+  nama String
 
-  recipes    Recipe[]
+  recipes Recipe[]
 }
 
 model Recipe {
-  id                 Int        @id @default(autoincrement())
-  namaMakanan        String
-  daerahAsal         String
-  gambar             String
-  deskripsi          String
-  bahan              String
-  langkahPembuatan   String
-  durasi             String
-  porsi              String
+  id               Int    @id @default(autoincrement())
+  namaMakanan      String
+  daerahAsal       String
+  gambar           String
+  deskripsi        String
+  bahan            String
+  langkahPembuatan String
+  durasi           String
+  porsi            String
 
-  userId             Int
-  kategoriId         Int
+  isPremium Boolean @default(false)
+  harga     Int?    @default(0)
 
-  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  userId     Int
+  kategoriId Int
 
-  category Category @relation(fields: [kategoriId],references: [id],onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category Category @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
 
   favorites Favorite[]
+
+  payments Payment[]
+
+  purchases Purchase[] // <- TAMBAHKAN INI
 
   createdAt DateTime @default(now())
 }
 
 model Favorite {
-  id         Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  userId     Int
-  recipeId   Int
+  userId   Int
+  recipeId Int
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  recipe Recipe @relation(fields: [recipeId], references: [id],onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+
+  userId   Int
+  recipeId Int
+
+  metode String
+  jumlah Int
+
+  status String @default("PENDING")
+
+  buktiTransfer String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model Purchase {
+  id Int @id @default(autoincrement())
+
+  userId   Int
+  recipeId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
