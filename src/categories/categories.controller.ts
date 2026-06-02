@@ -13,7 +13,7 @@ import { CategoriesService } from './categories.service';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 
-import { JwtAuthGuard } from '../auth/jwt.strategy';
+import { JwtStrategy } from '../auth/jwt.strategy';
 
 import { RolesGuard } from '../auth/roles.guard';
 
@@ -28,7 +28,7 @@ export class CategoriesController {
   // ADMIN ONLY
   @Post()
   @UseGuards(
-    JwtAuthGuard,
+    JwtStrategy,
     RolesGuard,
   )
   @Roles('ADMIN')
@@ -58,7 +58,7 @@ export class CategoriesController {
   // ADMIN ONLY
   @Put(':id')
   @UseGuards(
-    JwtAuthGuard,
+    JwtStrategy,
     RolesGuard,
   )
   @Roles('ADMIN')
@@ -76,7 +76,7 @@ export class CategoriesController {
   // ADMIN ONLY
   @Delete(':id')
   @UseGuards(
-    JwtAuthGuard,
+    JwtStrategy,
     RolesGuard,
   )
   @Roles('ADMIN')
