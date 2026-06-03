@@ -12,7 +12,7 @@ import { PaymentsService } from './payment.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 
 @Controller('payments')
 export class PaymentsController {
@@ -22,6 +22,19 @@ export class PaymentsController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'number', example: 7 },
+        recipeId: { type: 'number', example: 5 },
+        metode: { type: 'string', example: 'Transfer Bank' },
+        jumlah: { type: 'number', example: 15000 },
+        buktiTransfer: { type: 'string', example: 'https://...' },
+      },
+      required: ['userId', 'recipeId', 'metode', 'jumlah'],
+    },
+  })
   create(@Body() body: {
     userId: number;
     recipeId: number;
