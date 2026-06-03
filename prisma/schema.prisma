@@ -57,16 +57,12 @@ model Recipe {
   kategoriId Int
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   category Category @relation(fields: [kategoriId], references: [id], onDelete: Cascade)
-
   favorites Favorite[]
-
   payments Payment[]
-
   purchases Purchase[] // <- TAMBAHKAN INI
-
   createdAt DateTime @default(now())
+  price Int @default(0)
 }
 
 model Favorite {
