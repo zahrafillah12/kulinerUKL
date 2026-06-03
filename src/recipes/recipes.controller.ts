@@ -28,74 +28,63 @@ export class RecipesController {
   ) {}
 
   // CREATE - hanya ADMIN
-  @Post()
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
-  create(@Body() createRecipeDto: CreateRecipeDto) {
-    return this.recipesService.create(createRecipeDto);
-  }
-
-  // UPLOAD FILE - hanya ADMIN
-  @Post('upload')
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles('ADMIN')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
+ @Post('upload')
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt'), RolesGuard)
+@Roles('ADMIN')
+@ApiConsumes('multipart/form-data')
+@ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      file: {
+        type: 'string',
+        format: 'binary',
       },
     },
-  })
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          const uploadPath = './uploads/recipes';
-          if (!existsSync(uploadPath)) {
-            mkdirSync(uploadPath, { recursive: true });
-          }
-          cb(null, uploadPath);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() +
-            '-' +
-            Math.round(Math.random() * 1e9);
-          cb(
-            null,
-            uniqueSuffix + extname(file.originalname),
-          );
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        if (
-          !file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)
-        ) {
-          return cb(
-            new Error('Hanya file gambar yang diizinkan!'),
-            false,
-          );
+  },
+})
+@UseInterceptors(
+  FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const uploadPath = './uploads/recipes';
+
+        if (!existsSync(uploadPath)) {
+          mkdirSync(uploadPath, {
+            recursive: true,
+          });
         }
-        cb(null, true);
+
+        cb(null, uploadPath);
+      },
+
+      filename: (req, file, cb) => {
+        const uniqueSuffix =
+          Date.now() +
+          '-' +
+          Math.round(Math.random() * 1e9);
+
+        cb(
+          null,
+          uniqueSuffix +
+            extname(file.originalname),
+        );
       },
     }),
-  )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const baseUrl =
-      process.env.BASE_URL || 'http://localhost:3000';
-    return {
-      message: 'Upload berhasil',
-      filename: file.filename,
-      path: `${baseUrl}/uploads/recipes/${file.filename}`,
-    };
-  }
+  }),
+)
+uploadFile(@UploadedFile() file: Express.Multer.File) {
+
+  console.log('FILE UPLOAD:');
+  console.log(file);
+
+  return {
+    message: 'Upload berhasil',
+    filename: file.filename,
+    path: `http://localhost:3000/uploads/recipes/${file.filename}`,
+  };
+}
 
   // GET ALL - semua bisa akses
   @Get()

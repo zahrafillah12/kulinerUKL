@@ -1,82 +1,78 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
-  UploadedFile,
-  UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
-
-import { PaymentService } from './payment.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-
-import { FileInterceptor } from '@nestjs/platform-express';
-
-import { diskStorage } from 'multer';
+import { PaymentsService } from './payment.service';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('payments')
-export class PaymentController {
-  constructor(
-    private readonly paymentService: PaymentService,
-  ) {}
+export class PaymentsController {
+  constructor(private readonly paymentsService: PaymentsService) {}
 
+  // User buat payment
   @Post()
-  create(
-    @Body()
-    createPaymentDto: CreatePaymentDto,
-  ) {
-    return this.paymentService.create(
-      createPaymentDto,
-    );
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  create(@Body() body: {
+    userId: number;
+    recipeId: number;
+    metode: string;
+    jumlah: number;
+    buktiTransfer?: string;
+  }) {
+    return this.paymentsService.create(body);
   }
 
+  // Admin lihat semua payment
   @Get()
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
   findAll() {
-    return this.paymentService.findAll();
+    return this.paymentsService.findAll();
   }
 
-  @Post(':id/upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination:
-          './uploads/payments',
-
-        filename: (
-          req,
-          file,
-          cb,
-        ) => {
-          const filename =
-            Date.now() +
-            '-' +
-            file.originalname;
-
-          cb(null, filename);
-        },
-      }),
-    }),
-  )
-  uploadBukti(
-    @Param('id') id: string,
-
-    @UploadedFile()
-    file: Express.Multer.File,
-  ) {
-    return this.paymentService.uploadBukti(
-      Number(id),
-      file.filename,
-    );
+  // User lihat payment miliknya
+  @Get('user/:userId')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  findByUser(@Param('userId') userId: string) {
+    return this.paymentsService.findByUser(Number(userId));
   }
 
-  @Patch(':id/approve')
-  approve(
-    @Param('id') id: string,
-  ) {
-    return this.paymentService.approve(
-      Number(id),
-    );
+  // Admin konfirmasi payment
+  @Patch(':id/confirm')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
+  confirm(@Param('id') id: string) {
+    return this.paymentsService.confirm(Number(id));
+  }
+
+  // Admin tolak payment
+  @Patch(':id/reject')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
+  reject(@Param('id') id: string) {
+    return this.paymentsService.reject(Number(id));
+  }
+
+  // Hapus payment
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('ADMIN')
+  remove(@Param('id') id: string) {
+    return this.paymentsService.remove(Number(id));
   }
 }

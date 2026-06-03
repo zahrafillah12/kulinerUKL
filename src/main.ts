@@ -21,11 +21,11 @@ async function bootstrap() {
   }
 
   app.useStaticAssets(
-    join(__dirname, '..', 'uploads'),
-    {
-      prefix: '/uploads/',
-    },
-  );
+  join(process.cwd(), 'uploads'),
+  {
+    prefix: '/uploads/',
+  },
+);
 
   const config = new DocumentBuilder()
     .setTitle('Resep Kuliner API')
