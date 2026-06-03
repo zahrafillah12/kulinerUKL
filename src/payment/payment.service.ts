@@ -5,15 +5,37 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PaymentsService {
   constructor(private prisma: PrismaService) {}
 
-  // User buat payment
-  create(data: {
+  // User buat payment - otomatis SUCCESS
+  async create(data: {
     userId: number;
     recipeId: number;
     metode: string;
     jumlah: number;
     buktiTransfer?: string;
   }) {
-    return this.prisma.payment.create({ data });
+    const payment = await this.prisma.payment.create({
+      data: {
+        ...data,
+        status: 'SUCCESS', // ← langsung success
+      },
+    });
+
+    // Otomatis buat Purchase
+    await this.prisma.purchase.upsert({
+      where: {
+        userId_recipeId: {
+          userId: payment.userId,
+          recipeId: payment.recipeId,
+        },
+      },
+      update: {},
+      create: {
+        userId: payment.userId,
+        recipeId: payment.recipeId,
+      },
+    });
+
+    return payment;
   }
 
   // GET ALL - untuk admin
@@ -40,7 +62,6 @@ export class PaymentsService {
       data: { status: 'SUCCESS' },
     });
 
-    // Buat purchase agar user bisa akses resep
     await this.prisma.purchase.upsert({
       where: {
         userId_recipeId: {
