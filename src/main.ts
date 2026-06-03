@@ -9,23 +9,25 @@ import {
 } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app =
-    await NestFactory.create<NestExpressApplication>(
-      AppModule,
-    );
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // Auto buat folder uploads
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+  });
+
   const uploadPath = join(process.cwd(), 'uploads', 'recipes');
   if (!existsSync(uploadPath)) {
     mkdirSync(uploadPath, { recursive: true });
   }
 
   app.useStaticAssets(
-  join(process.cwd(), 'uploads'),
-  {
-    prefix: '/uploads/',
-  },
-);
+    join(process.cwd(), 'uploads'),
+    {
+      prefix: '/uploads/',
+    },
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Resep Kuliner API')
@@ -34,33 +36,16 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
-  const document =
-    SwaggerModule.createDocument(
-      app,
-      config,
-    );
+  const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup(
-    'api',
-    app,
-    document,
-  );
+  SwaggerModule.setup('api', app, document);
 
-  const port =
-    parseInt(process.env.PORT || '3000');
+  const port = parseInt(process.env.PORT || '3000');
 
-  await app.listen(
-    port,
-    '0.0.0.0',
-  );
+  await app.listen(port, '0.0.0.0');
 
-  console.log(
-    `Server running on port ${port}`,
-  );
-
-  console.log(
-    `Swagger running at /api`,
-  );
+  console.log(`Server running on port ${port}`);
+  console.log(`Swagger running at /api`);
 }
 
 bootstrap();
